@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI量化分析作业集 - 李明凯</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .task-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .task-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .task-card h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .task-card p {
+            color: #5a6c7d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #95a5a6;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 AI量化分析作业集</h1>
+        <p class="subtitle">姓名：李明凯 | 课程：BA数据分析</p>
+
+        <!-- Task 1 -->
+        <div class="task-card">
+            <h2>✅ Task 1：中际旭创数据分析</h2>
+            <p>分析中际旭创（300308.SZ）过去一年的交易数据，包含K线图、均线分析、成交量可视化及投资分析。</p>
+            <div class="btn-group">
+                <a href="./task1/中际旭创_完整分析面板.html" class="btn">📈 查看分析面板</a>
+                <a href="./task1/李明凯+TASK1.pdf" class="btn btn-secondary">📄 下载PDF报告</a>
+                <a href="https://github.com/Yeqianyiyue/ai-quant/tree/master/task1" class="btn btn-secondary">🔗 查看代码</a>
+            </div>
+        </div>
+
+        <!-- Task 2 -->
+        <div class="task-card">
+            <h2>✅ Task 2：技术指标分析</h2>
+            <p>中际旭创近三年的技术指标分析，包含RSI、MACD、布林带、KDJ四大指标的计算、可视化及交互式参数调节。</p>
+            <div class="btn-group">
+                <a href="./task2/李明凯+TASK2_交互式.html" class="btn">🎯 交互式面板（推荐）</a>
+                <a href="./task2/李明凯+TASK2.html" class="btn btn-secondary">📊 静态面板</a>
+                <a href="https://github.com/Yeqianyiyue/ai-quant/tree/master/task2" class="btn btn-secondary">🔗 查看代码</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📂 仓库地址：<a href="https://github.com/Yeqianyiyue/ai-quant">github.com/Yeqianyiyue/ai-quant</a></p>
+            <p>🕐 最后更新：2026年7月</p>
+        </div>
+    </div>
+</body>
+</html>
