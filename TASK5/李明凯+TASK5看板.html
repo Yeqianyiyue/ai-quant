@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>中际旭创 · 机器学习分类模型开发样例看板（TASK5）</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="dashboard_data.js"></script>
+<style>
+:root{--ink:#1f2733;--sub:#5b6675;--line:#e3e8ef;--bg:#f6f8fb;--card:#fff;--accent:#185FA5;--up:#A32D2D;--down:#1f8a4c;--soft:#eef3f9;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;line-height:1.75;font-size:15px;}
+header.hero{background:linear-gradient(135deg,#185FA5,#2b7fc4);color:#fff;padding:38px 24px 30px;}
+header.hero .wrap{max-width:1120px;margin:0 auto;}
+header.hero h1{margin:0 0 8px;font-size:26px;letter-spacing:1px;}
+header.hero p{margin:4px 0;opacity:.95;}
+.tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 10px;border-radius:14px;font-size:12px;margin:6px 6px 0 0;}
+main{max-width:1120px;margin:0 auto;padding:26px 22px 60px;}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 26px;margin:18px 0;box-shadow:0 1px 3px rgba(20,40,80,.04);}
+h2{font-size:20px;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--soft);color:var(--accent);}
+h3{font-size:16px;margin:20px 0 8px;color:#27384d;}
+p{margin:10px 0;}
+ul,ol{margin:8px 0 8px 22px;padding:0;}
+li{margin:5px 0;}
+.note{background:var(--soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;color:#2a3a4d;font-size:14px;margin:14px 0;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;}
+.algo{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fcfdff;}
+.algo h3{margin-top:4px;color:var(--accent);}
+.pill{font-size:12px;color:var(--sub);}
+.pros{color:var(--down);font-weight:600;}
+.cons{color:var(--up);font-weight:600;}
+.metric-tb{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;}
+.metric-tb th,.metric-tb td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.metric-tb th{background:var(--soft);text-align:left;}
+.up{color:var(--up);font-weight:600;}
+.down{color:var(--down);font-weight:600;}
+.chart-box{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:18px 0;background:#fff;padding:6px;}
+.chart-box .cap{padding:6px 14px 10px;font-size:13px;color:var(--sub);border-top:1px solid var(--line);}
+.chart{width:100%;min-height:400px;}
+.chart-sm{width:100%;min-height:220px;}
+.chart-ro{width:100%;min-height:380px;}
+.cm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
+.cm-cell{display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fafcff;}
+.cm-cell table{border-collapse:collapse;width:100%;}
+.cm-cell table td{text-align:center;font-weight:700;font-size:18px;padding:10px 6px;border:1px solid var(--line);}
+.cm-cell .cm-header{font-size:13px;font-weight:600;background:#f0f4f9;color:var(--ink);padding:4px 8px;}
+.cm-cell .cm-row-label{font-size:14px;font-weight:600;padding:6px;border:1px solid var(--line);text-align:center;background:#f0f4f9;width:34px;}
+.cm-cell .cm-title{font-weight:600;margin-bottom:6px;font-size:14px;color:var(--ink);}
+.cm-label{font-size:11px;color:var(--sub);margin-top:4px;}
+.dataframe{border-collapse:collapse;font-size:13px;margin:14px auto;width:100%;}
+.dataframe th,.dataframe td{border:1px solid #d7dee8;padding:6px 10px;text-align:center;}
+.dataframe th{background:#f0f4f9;}
+.bt{padding:14px 16px;border-radius:10px;background:#0f3a63;color:#fff;font-size:15px;margin:16px 0;line-height:1.8;}
+footer{max-width:1120px;margin:0 auto;padding:0 22px 40px;color:var(--sub);font-size:13px;}
+.toc{columns:2;column-gap:30px;font-size:14px;}
+.toc a{color:var(--accent);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<h1>中际旭创 · 机器学习分类模型开发样例看板</h1>
+<p>姓名：李明凯　|　数据：中际旭创（300308.SZ）日度交易数据（前复权）　|　任务：TASK5</p>
+<p>把一段股价走势转化为「预测次日涨跌方向」的有监督机器学习分类问题，并横向对比 7 种经典分类模型。</p>
+<div>
+<span class="tag">逻辑回归</span><span class="tag">K近邻</span><span class="tag">决策树</span>
+<span class="tag">随机森林</span><span class="tag">SVM</span><span class="tag">梯度提升</span>
+<span class="tag">多数类基线</span><span class="tag">逐模型 ROC-AUC</span><span class="tag">时序防泄漏</span>
+</div>
+<p style="margin-top:12px;font-size:13px;opacity:.7;">本看板不含代码。全部图表由 ECharts 在浏览器中直接绘制，数据来自原始计算。</p>
+</div></header>
+
+<main>
+
+<section><h2>目录</h2>
+<div class="toc">
+<a href="#s1">一、项目概览与数据</a><br/>
+<a href="#s2">二、策略与方法</a><br/>
+<a href="#s3">三、机器学习算法解释（7 个模型）</a><br/>
+<a href="#s4">四、评价指标解释</a><br/>
+<a href="#s5">五、可视化画廊（ECharts 直接绘制）</a><br/>
+<a href="#s6">六、模型对比汇总表</a><br/>
+<a href="#s7">七、结论、局限与扩展</a><br/>
+</div></section>
+
+<section id="s1"><h2>一、项目概览与数据</h2>
+<p>本看板演示一条完整的「量化 + 机器学习」流水线：从原始 OHLCV 行情出发，构造因子特征与涨跌标签，用严格的时间序列划分训练多个分类模型，最后用一套对类别不平衡稳健的指标进行评价。</p>
+<ul>
+<li><b>标的</b>：中际旭创（300308.SZ），A 股光模块龙头，2023–2026 AI 算力景气周期。</li>
+<li><b>样本量</b>：原始 727 交易日（2023-07-04 → 2026-07-03）；去除缺失后建模约 <span id="info-rows">—</span> 条。</li>
+<li><b>数据划分</b>：前 <span id="info-train">—</span> 条训练 / 后 <span id="info-test">—</span> 条测试。</li>
+<li><b>任务</b>：二分类——预测「次日是否上涨」。</li>
+<li><b>上涨占比</b>：约 <span id="info-upratio">—</span>，类别基本均衡。</li>
+<li><b>特征数</b>：<span id="info-ftcnt">—</span> 个因子（六族），详情见第二节。</li>
+</ul>
+<div class="note">配色约定（A 股惯例）：<span class="up">涨 = 红色</span>，<span class="down">跌 = 绿色</span>。</div>
+</section>
+
+<section id="s2"><h2>二、策略与方法</h2>
+<h3>2.1 标签构造（无未来函数）</h3>
+<p>定义 <code style="background:#eef;padding:1px 5px;border-radius:4px">y_t = 1</code> 若第 t+1 日收益率 > 0，否则 <code style="background:#eef;padding:1px 5px;border-radius:4px">y_t = 0</code>。<b>标签用了 t+1 的信息，特征只用 ≤ t 的信息</b>，无前视偏差。</p>
+<h3>2.2 特征工程（22 个因子，六族）</h3>
+<ul>
+<li><b>收益族</b>：对数收益、滞后 1/2/3 日收益、5/10/20 日累计收益。</li>
+<li><b>动量 / 均线族</b>：MA5/10/20/60、均线差、20/60 日动量（相对于均线的位置）。</li>
+<li><b>波动率族</b>：20/60 日收益标准差、ATR14（真实波幅）。</li>
+<li><b>技术指标族</b>：RSI14、MACD / 信号线 / 柱、布林带位置（沿用 TASK2）。</li>
+<li><b>成交量族</b>：5 日量能变化、5 日金额变化。</li>
+<li><b>形态族</b>：振幅、收盘在区间的位置。</li>
+</ul>
+<h3>2.3 防泄漏的数据划分</h3>
+<ul>
+<li><b>时间序列不能随机打乱</b>：股价前后相关，随机切分会让「未来」泄漏进训练集。</li>
+<li><b>按时间顺序切分</b>：前 80% 训练、后 20% 测试，测试集只评估一次。</li>
+<li><b>标准化只 fit 训练集</b>：<code style="background:#eef;padding:1px 5px;border-radius:4px">StandardScaler</code> 的均值/方差仅由训练集估计，再变换测试集。</li>
+<li><b>交叉验证用 TimeSeriesSplit</b>：只用较早折训练、较晚折验证。</li>
+</ul>
+</section>
+
+<section id="s3"><h2>三、机器学习算法解释</h2>
+<div class="card-grid">
+
+<div class="algo">
+<h3>逻辑回归</h3><p class="pill">线性模型 · 概率输出</p>
+<p><b>原理</b>：对特征线性组合施加 Sigmoid，输出概率 p∈[0,1]；以 0.5 为阈值得类别。</p>
+<p class="pros">优点：简单、可解释、输出校准概率。</p>
+<p class="cons">局限：只能学习线性边界。</p></div>
+
+<div class="algo">
+<h3>K 近邻</h3><p class="pill">非参数 · 惰性学习</p>
+<p><b>原理</b>：取特征空间中最近的 K 个邻居（K=5），多数投票分类；概率取邻居中"涨"的比例。</p>
+<p class="pros">优点：直观、可刻画非线性。</p>
+<p class="cons">局限：对量纲敏感（已标准化）、预测慢。</p></div>
+
+<div class="algo">
+<h3>决策树</h3><p class="pill">树模型 · 可解释</p>
+<p><b>原理</b>：递归二分样本（基尼 / 信息增益），形成规则树；depth=5 防过拟合。</p>
+<p class="pros">优点：可解释、不需标准化。</p>
+<p class="cons">局限：不稳定、易过拟合。</p></div>
+
+<div class="algo">
+<h3>随机森林</h3><p class="pill">集成 Bagging</p>
+<p><b>原理</b>：并行训练多棵树，行/列双重随机采样，投票综合；200 树，depth=8。</p>
+<p class="pros">优点：抗过拟合、稳健、特征重要性。</p>
+<p class="cons">局限：黑箱、稍慢。</p></div>
+
+<div class="algo">
+<h3>SVM</h3><p class="pill">边界型 · 核技巧</p>
+<p><b>原理</b>：最大化间隔超平面，RBF 核处理非线性；probability=True 校准概率以画 ROC。</p>
+<p class="pros">优点：高维稳健、边界清晰。</p>
+<p class="cons">局限：对尺度敏感、需概率校准。</p></div>
+
+<div class="algo">
+<h3>梯度提升</h3><p class="pill">集成 Boosting</p>
+<p><b>原理</b>：串行训练，每棵新树拟合残差（负梯度），强学习器。</p>
+<p class="pros">优点：精度高、灵活。</p>
+<p class="cons">局限：串行不可并行、易过拟合。</p></div>
+
+<div class="algo">
+<h3>多数类基线</h3><p class="pill">参照 · 地板</p>
+<p><b>原理</b>：永远预测训练集多数类（涨）；AUC 退化为 0.5（随机水平）。</p>
+<p class="pros">优点：零成本衡量"模型是否真有用"。</p>
+<p class="cons">局限：不学习任何规律。</p></div>
+</div></section>
+
+<section id="s4"><h2>四、评价指标解释</h2>
+<table class="metric-tb">
+<tr><th>指标</th><th>公式</th><th>含义</th></tr>
+<tr><td><b>准确率 Accuracy</b></td><td>(TP+TN)/m</td><td>整体正确率。<b>不平衡时失真</b>：90% 都跌时全猜跌也有 90% 却无判别力。</td></tr>
+<tr><td><b>精确率 Precision</b></td><td>TP/(TP+FP)</td><td>所有被判"涨"里真正涨的比例——"看多信号"的可靠度。</td></tr>
+<tr><td><b>召回率 Recall</b></td><td>TP/(TP+FN)</td><td>所有真涨中被抓住的比例——"不漏掉上涨"的能力。</td></tr>
+<tr><td><b>F1 分数</b></td><td>2·P·R/(P+R)</td><td>精确率与召回率的调和平均，对不均衡更稳健。</td></tr>
+<tr><td><b>ROC-AUC</b></td><td>曲线下面积</td><td>FPR 为横轴、TPR 为纵轴遍历阈值得到曲线。AUC 单值概括判别力，<b>对不平衡稳健</b>。对角线=0.5（随机），高于 0.5 有判别力。本看板<b>每个模型单独计算并绘图</b>。</td></tr>
+<tr><td><b>混淆矩阵</b></td><td>[[TN,FP],[FN,TP]]</td><td>行=真实，列=预测，直观显示涨跌被分错在何处，是精确率/召回率的来源。</td></tr>
+<tr><td><b>TimeSeriesSplit</b></td><td>—</td><td>按时间先后切折，只用过去折训练、未来折验证；scoring='roc_auc' 评估 AUC 稳定性。</td></tr>
+</table></section>
+
+<section id="s5"><h2>五、可视化画廊</h2>
+
+<!-- 5.1 特征相关性热力图 -->
+<h3>图1 · 特征相关性热力图</h3>
+<div class="chart-box"><div id="chart-corr" class="chart"></div><div class="cap">检查 22 个因子之间是否存在高度冗余。</div></div>
+
+<!-- 5.2 混淆矩阵 -->
+<h3>图2 · 各模型混淆矩阵</h3>
+<p>行 = 实际类别，列 = 预测类别。</p>
+<div id="cm-container" class="cm-grid"></div>
+
+<!-- 5.3 ROC 独立子图 -->
+<h3>图3 · 各模型 ROC 曲线（独立子图）</h3>
+<div class="chart-box"><div id="chart-roc-grid" class="chart" style="min-height:500px;"></div><div class="cap">每个模型单独绘制 ROC 曲线，均标注 AUC 值。</div></div>
+
+<!-- 5.4 ROC 叠加 -->
+<h3>图4 · 多模型 ROC 曲线对比</h3>
+<div class="chart-box"><div id="chart-roc-overlay" class="chart"></div><div class="cap">所有模型 ROC 叠于同一坐标系，方便横向比较判别力。</div></div>
+
+<!-- 5.5 性能对比 -->
+<h3>图5 · 各模型性能指标对比</h3>
+<div class="chart-box"><div id="chart-metrics" class="chart"></div><div class="cap">准确率 / 精确率 / 召回率 / F1 / AUC 五项指标横向对比。</div></div>
+
+<!-- 5.6 & 5.7 特征重要性 -->
+<h3>图6 · 随机森林 特征重要性 (Top15)</h3>
+<div class="chart-box"><div id="chart-imp-rf" class="chart-ro"></div><div class="cap">随机森林模型输出的特征重要性排序，前 15 个因子。</div></div>
+<h3>图7 · 梯度提升 特征重要性 (Top15)</h3>
+<div class="chart-box"><div id="chart-imp-gbm" class="chart-ro"></div><div class="cap">梯度提升模型输出的特征重要性排序，前 15 个因子。</div></div>
+
+<!-- 5.8 PCA 散点图 -->
+<h3>图8 · PCA 降维散点图</h3>
+<div class="chart-box"><div id="chart-pca" class="chart"></div><div class="cap">将 22 维特征降至 2 个主成分，红色=上涨、绿色=下跌。</div></div>
+
+<!-- 5.9 回测净值 -->
+<h3>图9 · 方向性策略回测</h3>
+<div class="chart-box"><div id="chart-backtest" class="chart"></div><div class="cap">方向性择时策略 vs 买入持有净值曲线（测试集，基准 100）。</div></div>
+</section>
+
+<section id="s6"><h2>六、模型对比汇总表</h2>
+<div id="model-table-wrap"></div>
+<div class="note">本例 AUC 普遍 0.53–0.55，仅略高于基线 0.5——日频涨跌方向预测难度高的诚实结论。显著高于 0.5 的模型才有真实预测力。</div>
+</section>
+
+<section id="s7"><h2>七、结论、局限与扩展</h2>
+<h3>结论要点</h3>
+<ul>
+<li>AUC 最高者判别力最强；多数类基线 AUC≈0.5 为随机水平。</li>
+<li>警惕过拟合：决策树训练集准、测试集低；随机森林/梯度提升更稳。</li>
+<li><b>AUC 高 ≠ 实盘盈利</b>：方向预测与收益幅度、交易成本是两回事。</li>
+</ul>
+<h3>方向性策略回测结果</h3>
+<div class="bt" id="bt-result">加载中…</div>
+<h3>局限</h3>
+<ul>
+<li>方向预测 ≠ 收益预测；未计交易成本；样本约 660 条偏小。</li>
+<li>AUC 接近 0.5，因子对次日方向解释力有限。</li>
+</ul>
+<h3>扩展方向</h3>
+<ul>
+<li>超参调优（GridSearchCV, scoring=roc_auc）、多分类（涨/平/跌）、walk-forward 验证。</li>
+<li>加入更多股票做横截面；XGBoost / LightGBM；概率权重择时。</li>
+</ul>
+</section>
+</main>
+<footer>数据源：中际旭创（300308.SZ）日度交易数据（前复权）　|　图表由 ECharts 5 绘制　|　© 2026</footer>
+
+<script>
+// ===================== 全局变量 =====================
+const D = window.dashboardData;
+if (!D) { document.write('<p style="color:red;padding:40px;">错误：dashboard_data.js 未加载。请确保看板与数据文件在同一目录。</p>'); }
+
+// ===================== 填充数据概要 =====================
+function info(id, val) {
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+const S = D.summary;
+info('info-rows', S.rows);
+info('info-train', S.train);
+info('info-test', S.test);
+info('info-upratio', S.up_ratio);
+info('info-ftcnt', S.features_count);
+
+// ===================== 工具函数 =====================
+const modelNames = ['逻辑回归','K近邻','决策树','随机森林','SVM','梯度提升','多数类基线'];
+
+// 混淆矩阵着色函数：确保文字可读
+function cmColor(v, maxV) {
+  const ratio = maxV > 0 ? v / maxV : 0;
+  const r = Math.round(245 - ratio * 200);
+  const g = Math.round(248 - ratio * 200);
+  const b = Math.round(255 - ratio * 50);
+  return { bg: `rgb(${r},${g},${b})`, text: ratio > 0.5 ? '#fff' : '#1f2733' };
+}
+
+// ===================== 5.1 相关性热力图 =====================
+(function(){
+  const dom = document.getElementById('chart-corr');
+  const corr = D.correlation;
+  const labels = D.features_cn;
+  const data = [];
+  for(let i=0;i<corr.length;i++){
+    for(let j=0;j<corr[i].length;j++){
+      data.push([j, i, corr[i][j]]); // x=col, y=row
+    }
+  }
+  const chart = echarts.init(dom);
+  chart.setOption({
+    tooltip:{position:'top', formatter(p){return labels[p.value[1]]+' × '+labels[p.value[0]]+'<br/>相关系数: '+p.value[2].toFixed(3);}},
+    grid:{left:110,right:30,top:20,bottom:90},
+    xAxis:{type:'category',data:labels,axisLabel:{rotate:45,interval:0,fontSize:9}},
+    yAxis:{type:'category',data:labels.slice().reverse(),axisLabel:{fontSize:9}},
+    visualMap:{min:-1,max:1,inRange:{color:['#1f8a4c','#fff','#A32D2D']},calculable:true,orient:'horizontal',left:'center',bottom:20,itemWidth:200},
+    series:[{type:'heatmap',data,label:{show:true,fontSize:8,formatter(p){return p.value[2].toFixed(1);}}}]  
+  });
+  window.addEventListener('resize',()=>chart.resize());
+})();
+
+// ===================== 5.2 混淆矩阵（HTML 表格，确保对比度） =====================
+(function(){
+  const cm = D.confusion_matrix;
+  const models = modelNames;
+  const container = document.getElementById('cm-container');
+  let html = '';
+  models.forEach(name => {
+    const m = cm[name];
+    const maxV = Math.max(...m.flat());
+    const c00 = cmColor(m[0][0], maxV), c01 = cmColor(m[0][1], maxV);
+    const c10 = cmColor(m[1][0], maxV), c11 = cmColor(m[1][1], maxV);
+    html += `<div class="cm-cell">
+      <div class="cm-title">${name}</div>
+      <table>
+        <tr><td class="cm-header">　</td><td class="cm-header">跌</td><td class="cm-header">涨</td></tr>
+        <tr><td class="cm-row-label">跌</td>
+            <td style="background:${c00.bg};color:${c00.text};">${m[0][0]}</td>
+            <td style="background:${c01.bg};color:${c01.text};">${m[0][1]}</td></tr>
+        <tr><td class="cm-row-label">涨</td>
+            <td style="background:${c10.bg};color:${c10.text};">${m[1][0]}</td>
+            <td style="background:${c11.bg};color:${c11.text};">${m[1][1]}</td></tr>
+      </table>
+      <div class="cm-label">行：实际　|　列：预测</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+})();
+
+// ===================== 5.3 ROC 独立子图（7 图网格） =====================
+(function(){
+  const dom = document.getElementById('chart-roc-grid');
+  const chart = echarts.init(dom);
+  const rd = D.roc_data;
+  const models = modelNames;
+  const n = models.length;
+  const cols = 3;
+  const rows = Math.ceil(n/cols);
+  
+  // 计算每个 grid 的位置
+  function makeGrids(n, cols) {
+    const grids = [], xAxes=[], yAxes=[], series=[];
+    const padL=4, padR=2, padT=8, padB=6;
+    const gapH=3, gapV=3;
+    const totalW=100-padL-padR;
+    const totalH=100-padT-padB;
+    const cw = totalW/cols;
+    const rh = totalH/rows;
+    const colors = ['#A32D2D','#185FA5','#1f8a4c','#d97706','#7c3aed','#0891b2','#78716c'];
+    models.forEach((name,i)=>{
+      const col = i%cols, row = Math.floor(i/cols);
+      const left = padL + col*cw + gapH/2;
+      const top = padT + row*rh + gapV/2;
+      const w = cw - gapH;
+      const h = rh - gapV;
+      grids.push({left:left+'%',top:top+'%',width:w+'%',height:h+'%'});
+      xAxes.push({type:'value',gridIndex:i,show:row===rows-1,name:'FPR',min:0,max:1,nameLocation:'center',nameGap:20,nameTextStyle:{fontSize:9}});
+      yAxes.push({type:'value',gridIndex:i,show:col===0,name:'TPR',min:0,max:1,nameLocation:'center',nameGap:25,nameTextStyle:{fontSize:9}});
+      const d = rd[name];
+      series.push({
+        type:'line',data:d.fpr.map((v,idx)=>[v, d.tpr[idx]]),
+        smooth:true,showSymbol:false,lineStyle:{width:2,color:colors[i]},
+        xAxisIndex:i,yAxisIndex:i,
+        areaStyle:{color:colors[i]+'22'}
+      });
+      // 基线对角线
+      series.push({
+        type:'line',data:[[0,0],[1,1]],
+        lineStyle:{type:'dashed',width:1,color:'#888'},showSymbol:false,
+        xAxisIndex:i,yAxisIndex:i,
+        label:{show:true,formatter:'AUC='+(d.auc).toFixed(3),fontSize:11,color:colors[i],fontWeight:700,
+               position:'bottom',distance:14}
+      });
+    });
+    return {grids, xAxes, yAxes, series};
+  }
+  const g = makeGrids(n, cols);
+  const titles = models.map((n,i)=>({text:n,left:(i%cols)/cols*100+10+'%',top:Math.floor(i/cols)/rows*100+1+'%',textStyle:{fontSize:12,fontWeight:600,color:'#333'}}));
+  chart.setOption({
+    grid: g.grids, xAxis: g.xAxes, yAxis: g.yAxes,
+    series: g.series,
+    title: titles,
+    tooltip:{formatter(p){return '('+p.data[0].toFixed(2)+', '+p.data[1].toFixed(2)+')';}}
+  });
+  window.addEventListener('resize',()=>chart.resize());
+})();
+
+// ===================== 5.4 ROC 叠加 =====================
+(function(){
+  const dom = document.getElementById('chart-roc-overlay');
+  const chart = echarts.init(dom);
+  const rd = D.roc_data;
+  const colors = ['#A32D2D','#185FA5','#1f8a4c','#d97706','#7c3aed','#0891b2','#78716c'];
+  const series = modelNames.map((name,i)=>{
+    const d = rd[name];
+    return {
+      type:'line',data:d.fpr.map((v,idx)=>[v,d.tpr[idx]]),
+      smooth:true,showSymbol:false,name:name+' (AUC='+d.auc.toFixed(3)+')',
+      lineStyle:{width:2,color:colors[i]}
+    };
+  });
+  series.push({type:'line',data:[[0,0],[1,1]],lineStyle:{type:'dashed',width:1,color:'#888'},showSymbol:false,name:'随机 (AUC=0.500)'});
+  chart.setOption({
+    tooltip:{trigger:'axis',formatter(p){let r='<b>ROC 对比</b><br/>';p.forEach(x=>r+=x.marker+x.seriesName+' ('+x.data[0].toFixed(2)+', '+x.data[1].toFixed(2)+')<br/>');return r;}},
+    legend:{top:5,textStyle:{fontSize:11}},
+    grid:{left:55,right:20,top:60,bottom:40},
+    xAxis:{type:'value',name:'假正率 FPR',min:0,max:1},
+    yAxis:{type:'value',name:'真正率 TPR',min:0,max:1},
+    series
+  });
+  window.addEventListener('resize',()=>chart.resize());
+})();
+
+// ===================== 5.5 性能对比柱状图 =====================
+(function(){
+  const dom = document.getElementById('chart-metrics');
+  const chart = echarts.init(dom);
+  const metrics = D.metrics;
+  const colors = ['#A32D2D','#185FA5','#1f8a4c','#d97706','#7c3aed'];
+  const metKeys = ['准确率','精确率','召回率','F1','AUC'];
+  const series = metKeys.map((k,i)=>({
+    name:k,type:'bar',data:metrics.map(m=>m[k]),itemStyle:{color:colors[i]}
+  }));
+  chart.setOption({
+    tooltip:{trigger:'axis'},
+    legend:{top:5,textStyle:{fontSize:12}},
+    grid:{left:50,right:20,top:50,bottom:30},
+    xAxis:{type:'category',data:metrics.map(m=>m['模型']),axisLabel:{rotate:15,fontSize:11}},
+    yAxis:{type:'value',min:0,max:1.05},
+    series
+  });
+  window.addEventListener('resize',()=>chart.resize());
+})();
+
+// ===================== 5.6 特征重要性（RF & GBM） =====================
+function renderFeatImp(domId, impData, title){
+  const dom = document.getElementById(domId);
+  const chart = echarts.init(dom);
+  const data = impData.features_cn.map((n,i)=>({name:n,value:impData.values[i]}));
+  chart.setOption({
+    title:{text:title,left:'center',textStyle:{fontSize:14}},
+    tooltip:{trigger:'axis',formatter(p){return p[0].name+': '+p[0].value.toFixed(4);}},
+    grid:{left:140,right:40,top:30,bottom:20},
+    yAxis:{type:'category',data:data.map(d=>d.name).reverse(),axisLabel:{fontSize:11}},
+    xAxis:{type:'value',name:'重要性'},
+    series:[{type:'bar',data:data.map(d=>d.value).reverse(),itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#185FA5'},{offset:1,color:'#7c3aed'}]}}}]
+  });
+  window.addEventListener('resize',()=>chart.resize());
+}
+renderFeatImp('chart-imp-rf', D.feat_imp['随机森林'], '随机森林 特征重要性 (Top15)');
+renderFeatImp('chart-imp-gbm', D.feat_imp['梯度提升'], '梯度提升 特征重要性 (Top15)');
+
+// ===================== 5.8 PCA 散点图（真实数据） =====================
+(function(){
+  const dom = document.getElementById('chart-pca');
+  const chart = echarts.init(dom);
+  const pc = D.pca_scatter;
+  const upData = pc.filter(d=>d.label===1).map(d=>({value:[d.x,d.y]}));
+  const downData = pc.filter(d=>d.label===0).map(d=>({value:[d.x,d.y]}));
+  chart.setOption({
+    title:{text:'PCA 降维到 2D 的散点图',left:'center',textStyle:{fontSize:14}},
+    tooltip:{trigger:'item',formatter(p){return (p.dataIndex!==undefined?'类别:'+(p.seriesIndex===0?'涨':'跌'):'');}},
+    legend:{bottom:5,textStyle:{fontSize:12}},
+    grid:{left:50,right:20,top:40,bottom:50},
+    xAxis:{type:'value',name:'PC1'},
+    yAxis:{type:'value',name:'PC2'},
+    series:[
+      {type:'scatter',name:'涨（正例）',data:upData,symbolSize:8,itemStyle:{color:'#A32D2D33',borderColor:'#A32D2D',borderWidth:1}},
+      {type:'scatter',name:'跌（负例）',data:downData,symbolSize:8,itemStyle:{color:'#1f8a4c33',borderColor:'#1f8a4c',borderWidth:1}}
+    ]
+  });
+  window.addEventListener('resize',()=>chart.resize());
+})();
+
+// ===================== 5.9 回测净值 =====================
+(function(){
+  const dom = document.getElementById('chart-backtest');
+  const chart = echarts.init(dom);
+  const bt = D.backtest;
+  chart.setOption({
+    tooltip:{trigger:'axis',formatter(p){let r='<b>净值对比</b><br/>';p.forEach(x=>r+=x.marker+x.seriesName+': '+x.value.toFixed(2)+'<br/>');return r;}},
+    legend:{top:5,textStyle:{fontSize:12}},
+    grid:{left:55,right:20,top:50,bottom:40},
+    xAxis:{type:'category',data:bt.dates,axisLabel:{fontSize:9,rotate:45}},
+    yAxis:{type:'value',name:'净值 (基准100)'},
+    series:[
+      {type:'line',name:'方向性策略（'+bt.best_model+'）',data:bt.strategy_nav,showSymbol:false,lineStyle:{width:2,color:'#A32D2D'},
+       areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#A32D2D44'},{offset:1,color:'#A32D2D00'}]}}},
+      {type:'line',name:'买入持有',data:bt.buyhold_nav,showSymbol:false,lineStyle:{width:2,color:'#185FA5'}}
+    ]
+  });
+  window.addEventListener('resize',()=>chart.resize());
+
+  // 回测结论文本
+  document.getElementById('bt-result').innerHTML =
+    `策略累计收益：<b>${bt.strategy_return.toFixed(2)}%</b> | 买入持有累计收益：<b>${bt.buyhold_return.toFixed(2)}%</b>　——　说明：用 AUC 最高模型「${bt.best_model}」的信号构造次日择时策略，与买入持有对比。注意这是单一牛市样本的结果，不代表稳定盈利能力。`;
+})();
+
+// ===================== 6. 模型对比表 =====================
+(function(){
+  const wrap = document.getElementById('model-table-wrap');
+  const m = D.metrics;
+  // 按 AUC 降序
+  m.sort((a,b)=>b.AUC - a.AUC);
+  // find AUC range for coloring
+  const aucVals = m.map(r=>r.AUC);
+  const minAuc = Math.min(...aucVals), maxAuc = Math.max(...aucVals);
+  const range = maxAuc - minAuc || 1;
+  function aucColor(v){
+    const ratio = (v - minAuc) / range; // 0~1
+    const r = Math.round(255 - ratio * 150);
+    const g = Math.round(255 - ratio * 50);
+    const b = Math.round(255 - ratio * 0);
+    return `rgb(${r},${Math.min(g,240)},${Math.min(b,240)})`;
+  }
+  let html = `<table class="dataframe"><thead><tr><th>模型</th><th>准确率</th><th>精确率</th><th>召回率</th><th>F1</th><th>AUC</th><th>CV_AUC均值</th><th>CV_AUC_std</th></tr></thead><tbody>`;
+  m.forEach(r => {
+    html += `<tr>
+      <td><b>${r['模型']}</b></td>
+      <td>${r['准确率'].toFixed(3)}</td>
+      <td>${r['精确率'].toFixed(3)}</td>
+      <td>${r['召回率'].toFixed(3)}</td>
+      <td>${(r['F1']).toFixed(3)}</td>
+      <td style="background:${aucColor(r['AUC'])};font-weight:700;">${r['AUC'].toFixed(3)}</td>
+      <td>${(r['CV_AUC均值']||0).toFixed(3)}</td>
+      <td>${(r['CV_AUC_std']||0).toFixed(3)}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+})();
+</script>
+</body>
+</html>
